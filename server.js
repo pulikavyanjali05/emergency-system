@@ -3,41 +3,55 @@ const app = express();
 
 app.use(express.json());
 
-// Twilio
-const accountSid = "ACefb22728606d39506ac109aeaa2401cc";
-const authToken = "f32ad29ed0fa679cd892defa502dacbf";
+// 🔐 Twilio credentials from environment variables
+const accountSid = process.env.ACCOUNT_SID;
+const authToken = process.env.AUTH_TOKEN;
+
+// Initialize Twilio client
 const client = require("twilio")(accountSid, authToken);
 
-const TO_NUMBER = "+919440004658";
-const FROM_NUMBER = "+14782238180";
+// 📞 Phone numbers
+const TO_NUMBER = "+919440004658";   // Your verified number
+const FROM_NUMBER = "+14782238180";  // Twilio number
 
-// API
+// 🧪 Test route (IMPORTANT)
+app.get("/", (req, res) => {
+    res.send("🚀 Emergency System is Running!");
+});
+
+// 🚨 ALERT API
 app.post("/alert", async (req, res) => {
     console.log("🚨 Emergency received!");
 
     try {
+        // 📩 Send SMS
         await client.messages.create({
             body: "🚨 HELP! Emergency detected!",
             from: FROM_NUMBER,
             to: TO_NUMBER
         });
 
+        console.log("✅ SMS sent");
+
+        // 📞 Make call
         await client.calls.create({
-            url: "http://demo.twilio.com/docs/voice.xml",
+            url: "https://demo.twilio.com/docs/voice.xml",
             to: TO_NUMBER,
             from: FROM_NUMBER
         });
 
-        res.send("Alert sent!");
+        console.log("✅ Call triggered");
+
+        res.send("✅ Alert sent successfully!");
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Error");
+        console.error("❌ ERROR:", err.message);
+        res.status(500).send("❌ Error sending alert");
     }
 });
 
-// PORT FIX (important for :contentReference[oaicite:0]{index=0})
+// 🌐 PORT (Render requirement)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });

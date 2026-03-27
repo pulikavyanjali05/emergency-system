@@ -1,3 +1,17 @@
-"scripts": {
-  "start": "node server.js"
+{
+  "name": "emergency-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.18.2",
+    "twilio": "^4.0.0"
+  }
 }

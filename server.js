@@ -3,17 +3,18 @@ const app = express();
 
 app.use(express.json());
 
-// Twilio credentials
+// 🔐 Twilio credentials from environment variables
 const accountSid = process.env.ACCOUNT_SID;
 const authToken = process.env.AUTH_TOKEN;
 
+// Initialize Twilio client
 const client = require("twilio")(accountSid, authToken);
 
-// Numbers
-const TO_NUMBER = "+919440004658";
-const FROM_NUMBER = "+14782238180";
+// 📞 Phone numbers
+const TO_NUMBER = "+919440004658";   // Your verified number
+const FROM_NUMBER = "+14782238180";  // Twilio number
 
-// ✅ HOME ROUTE (FIX)
+// 🧪 Test route (IMPORTANT)
 app.get("/", (req, res) => {
     res.send("🚀 Emergency System is Running!");
 });
@@ -23,6 +24,7 @@ app.post("/alert", async (req, res) => {
     console.log("🚨 Emergency received!");
 
     try {
+        // 📩 Send SMS
         await client.messages.create({
             body: "🚨 HELP! Emergency detected!",
             from: FROM_NUMBER,
@@ -31,36 +33,25 @@ app.post("/alert", async (req, res) => {
 
         console.log("✅ SMS sent");
 
+        // 📞 Make call
         await client.calls.create({
-            url: "https://emergency-system-1.onrender.com/voice",
+            url: "https://demo.twilio.com/docs/voice.xml",
             to: TO_NUMBER,
             from: FROM_NUMBER
         });
 
         console.log("✅ Call triggered");
 
-        res.send("✅ Alert sent!");
-
+        res.send("✅ Alert sent successfully!");
     } catch (err) {
         console.error("❌ ERROR:", err.message);
-        res.status(500).send("❌ Error");
+        res.status(500).send("❌ Error sending alert");
     }
 });
 
-// 🎤 VOICE
-app.all("/voice", (req, res) => {
-    res.type("text/xml");
+// 🌐 PORT (Render requirement)
+const PORT = process.env.PORT || 3000;
 
-    res.send(`
-        <Response>
-            <Say voice="alice">
-                I am in emergency. Please help me.
-            </Say>
-        </Response>
-    `);
-});
-
-// PORT
-app.listen(3000, () => {
-    console.log("🚀 Server running on port 3000");
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });

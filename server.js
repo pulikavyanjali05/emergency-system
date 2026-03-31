@@ -12,56 +12,75 @@ const client = require("twilio")(accountSid, authToken);
 const TO_NUMBER = "+919440004658";
 const FROM_NUMBER = "+14782238180";
 
+// 📍 Store mobile location
+let latestLocation = { lat: null, lng: null };
+
 // 🧪 Test route
 app.get("/", (req, res) => {
     res.send("🚀 Emergency System is Running!");
 });
 
 
-// 🚨 ALERT API (UPDATED)
+// 📍 MOBILE → SEND LOCATION
+app.post("/location", (req, res) => {
+    const { lat, lng } = req.body;
+
+    latestLocation = { lat, lng };
+
+    console.log("📍 Mobile Location:", lat, lng);
+
+    res.send("✅ Location received");
+});
+
+
+// 🚨 ESP32 → ALERT TRIGGER
 app.post("/alert", async (req, res) => {
-    console.log("🚨 Emergency received!");
+    console.log("🚨 Emergency triggered!");
 
     try {
-        // 👉 Get location from ESP32
-        const { lat, lng } = req.body;
 
-        // 👉 Google Maps link
-        const locationLink = `https://maps.google.com/?q=${lat},${lng}`;
+        // ⏳ Wait for mobile location
+        setTimeout(async () => {
 
-        // 📩 SMS with location
-        await client.messages.create({
-            body: `🚨 HELP! Emergency detected!\nLocation: ${locationLink}`,
-            from: FROM_NUMBER,
-            to: TO_NUMBER
-        });
+            if (latestLocation.lat && latestLocation.lng) {
 
-        console.log("✅ SMS sent");
+                const locationLink = `https://maps.google.com/?q=${latestLocation.lat},${latestLocation.lng}`;
 
-        // 📞 Call with custom voice
-        await client.calls.create({
-            url: `https://emergency-system-5zuw.onrender.com/voice`, // 👈 CHANGE THIS
-            to: TO_NUMBER,
-            from: FROM_NUMBER
-        });
+                // 📩 SMS
+                await client.messages.create({
+                    body: `🚨 HELP! Emergency!\nLocation: ${locationLink}`,
+                    from: FROM_NUMBER,
+                    to: TO_NUMBER
+                });
 
-        console.log("✅ Call triggered");
+                console.log("✅ SMS sent");
 
-        res.send("✅ Alert sent successfully!");
+                // 📞 Call
+                await client.calls.create({
+                    url: "https://emergency-system-5zuw.onrender.com/voice",
+                    to: TO_NUMBER,
+                    from: FROM_NUMBER
+                });
+
+                console.log("✅ Call triggered");
+
+            } else {
+                console.log("❌ No location received from mobile");
+            }
+
+        }, 5000); // wait 5 sec
+
+        res.send("✅ Alert received");
 
     } catch (err) {
         console.error("❌ ERROR:", err.message);
-        res.status(500).send("❌ Error sending alert");
+        res.status(500).send("Error");
     }
 });
 
 
-// 🎤 VOICE MESSAGE (NEW)
+// 🎤 VOICE MESSAGE
 app.all("/voice", (req, res) => {
-
-    const lat = req.query.lat;
-    const lng = req.query.lng;
-
     res.type("text/xml");
 
     res.send(`

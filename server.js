@@ -40,7 +40,7 @@ app.post("/alert", async (req, res) => {
 
         // 📞 Call with custom voice
         await client.calls.create({
-            url: `https://your-render-url.onrender.com/voice?lat=${lat}&lng=${lng}`, // 👈 CHANGE THIS
+            url: `https://emergency-system-5zuw.onrender.com/voice?lat=${lat}&lng=${lng}`, // 👈 CHANGE THIS
             to: TO_NUMBER,
             from: FROM_NUMBER
         });

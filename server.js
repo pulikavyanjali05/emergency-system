@@ -57,7 +57,7 @@ app.post("/alert", async (req, res) => {
 
 
 // 🎤 VOICE MESSAGE (NEW)
-app.post("/voice", (req, res) => {
+app.all("/voice", (req, res) => {
 
     const lat = req.query.lat;
     const lng = req.query.lng;

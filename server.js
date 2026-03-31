@@ -13,6 +13,11 @@ const client = require("twilio")(accountSid, authToken);
 const TO_NUMBER = "+919440004658";
 const FROM_NUMBER = "+14782238180";
 
+// ✅ HOME ROUTE (FIX)
+app.get("/", (req, res) => {
+    res.send("🚀 Emergency System is Running!");
+});
+
 // 🚨 ALERT API
 app.post("/alert", async (req, res) => {
     console.log("🚨 Emergency received!");
@@ -55,6 +60,7 @@ app.all("/voice", (req, res) => {
     `);
 });
 
+// PORT
 app.listen(3000, () => {
     console.log("🚀 Server running on port 3000");
 });

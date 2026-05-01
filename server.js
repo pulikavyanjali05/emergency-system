@@ -12,7 +12,7 @@ const client = require("twilio")(accountSid, authToken);
 
 // 📞 Phone numbers
 const TO_NUMBER = "+919440004658";   // Your verified number
-const FROM_NUMBER = "+15187503213";  // Twilio number
+const FROM_NUMBER = "+18145645785";  // Twilio number
 
 // 🧪 Test route (IMPORTANT)
 app.get("/", (req, res) => {
